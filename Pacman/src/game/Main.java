@@ -1,6 +1,10 @@
 package game;
 
-// Just the Main program to launch the java application.
+/**  
+ * The Main class to launch the Pacman Shooter Java Application
+ * 
+ * @author Wesley Tu
+ */
 public class Main {
 	public static void main(String[] args) {
 		
