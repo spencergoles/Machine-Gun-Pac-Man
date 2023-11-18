@@ -9,49 +9,61 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * This class manages the PostgreSQL database connection and provides methods for interacting with the database.
+ * 
+ * @author Spencer Goles
+*/
 public class DatabaseManager {
     private PGSimpleDataSource dataSource;
 
+    /**
+     * Constructs a new DatabaseManager and initialize the data source with PostgreSQL connection details.
+    */
     public DatabaseManager() {
         this.dataSource = new PGSimpleDataSource();
-        this.dataSource.setServerName("ec2-3-232-218-211.compute-1.amazonaws.com");
-        this.dataSource.setDatabaseName("d57pblt23lgs71");
-        this.dataSource.setUser("luzyzvsjnmrsdo");
+
+        //Replace with the correct information
+        this.dataSource.setServerName("SERVER_NAME");
+        this.dataSource.setDatabaseName("DATABASE_NAME");
+        this.dataSource.setUser("USER");
         this.dataSource.setPortNumber(5432);
-        this.dataSource.setPassword("fcc49cb27a58333f0793daeafc59a6d9cd9cd5f5765e0b12bcf46c401227918e");
-
+        this.dataSource.setPassword("PASSWORD");
     }
 
-    /* 
-    public DatabaseManager(String host, String database, String user, int port, String password) {
-        this.dataSource = new PGSimpleDataSource();
-        this.dataSource.setServerName(host);
-        this.dataSource.setDatabaseName(database);
-        this.dataSource.setUser(user);
-        this.dataSource.setPortNumber(port);
-        this.dataSource.setPassword(password);
-    }
+    /**
+     * Connection to the PostgreSQL database.
+     *
+     * @return A connection to the PostgreSQL database.
+     * @throws SQLException if a database access error occurs.
     */
-
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
+    /**
+     * Closes the  database connection.
+     *
+     * @param connection The connection to be closed.
+     * @throws SQLException if a database access error occurs.
+    */
     public void closeConnection(Connection connection) throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
+    /**
+     * Executes a query on the specified table and prints the results.
+     *
+     * @param tableName The name of the table to query.
+    */
     public void queryAndPrintData(String tableName) {
         try (Connection connection = getConnection()) {
             System.out.println("Connected to the PostgreSQL server.");
 
-            // Example query
             String sql = "SELECT * FROM " + tableName;
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                // Execute the query
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     // Get metadata about the result set (columns, types, etc.)
                     ResultSetMetaData metaData = resultSet.getMetaData();
@@ -64,7 +76,6 @@ public class DatabaseManager {
                             String columnName = metaData.getColumnName(i);
                             Object columnValue = resultSet.getObject(i);
 
-                            // Print the data
                             System.out.println(columnName + ": " + columnValue);
                         }
                         System.out.println(); // Add a line break between rows
@@ -75,9 +86,12 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
-
    
-
+    /**
+     * Adds a new score to the leaderboard table.
+     *
+     * @param score The score to be added.
+    */
     public void addScore(int score) {
         try (Connection connection = getConnection()) {
             System.out.println("Connected to the PostgreSQL server.");
@@ -105,20 +119,31 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Retrieves the maximum rank from the leaderboard table.
+     *
+     * @param connection The database connection.
+     * @return The maximum rank in the leaderboard table.
+     * @throws SQLException if a database access error occurs.
+    */
     private int getMaxRank(Connection connection) throws SQLException {
         // Get the maximum rank from the leaderboard table
         String maxRankSql = "SELECT MAX(rank) FROM leaderboard";
         try (PreparedStatement maxRankStatement = connection.prepareStatement(maxRankSql)) {
             try (ResultSet resultSet = maxRankStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getInt(1); // Return the maximum rank
+                    return resultSet.getInt(1);
                 }
             }
         }
-        return 1; // Default to 0 if there are no rows in the table
+        return 1;
     }
 
-
+    /**
+     * Deletes the score for the specified rank from the leaderboard table.
+     *
+     * @param rank The rank for which the score should be deleted.
+    */
     public void deleteScore(int rank) {
         try (Connection connection = getConnection()) {
             System.out.println("Connected to the PostgreSQL server.");
@@ -142,6 +167,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Deletes all scores from the leaderboard table.
+    */
     public void deleteAllScores() {
         try (Connection connection = getConnection()) {
             System.out.println("Connected to the PostgreSQL server.");
@@ -163,6 +191,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Retrieves the top three scores from the leaderboard table.
+     *
+     * @return A map containing the top three scores, where the key is the rank and the value is the score.
+    */
     public Map<Integer, Integer> getTopThreeScores() {
         Map<Integer, Integer> topThreeScores = new HashMap<>();
 
@@ -189,7 +222,6 @@ public class DatabaseManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return topThreeScores;
     }
 }
