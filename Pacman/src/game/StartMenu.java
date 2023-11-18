@@ -21,9 +21,19 @@ import java.util.Random;
 import javax.swing.Timer;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-
+/**
+ * The StartMenu class creates the panel in which all elements of the Pacman
+ * shooter would be inserted into.
+ * 
+ * @author Wesley Tu
+ */
 public class StartMenu extends JPanel implements ActionListener {
 	
+	/**
+	 * variables to keep track of panel width, panel height, the starting location
+	 * of Pacman and the maximum number of each ghost. There's also a counter to spawn
+	 * the ghosts and a boolean variable to keep track if there is a game over or not.
+	 */
 	private final int PANEL_WIDTH= 568;
 	private final int PANEL_HEIGHT = 360;
 	private final int PACMAN_STARTX = 50;
@@ -33,14 +43,26 @@ public class StartMenu extends JPanel implements ActionListener {
 	private int counter = 0;
 	private boolean playing;
 	private static final long serialVersionUID = -3070933422348067426L;
+	
+	/**
+	 * Variables to keep track of the various entities and images to display.
+	 */
 	private Image background;
 	private Pacman pacman;
 	private List<Left_Ghost> lghosts;
 	private List<Diagonal_Ghost> dghosts;
-	private Timer timer1;
-	private int score = 0;
 	private Image half_health = new ImageIcon("half_health.png").getImage();
 	
+	/**
+	 * Timer to advance the program each millisecond to play the game, plus a score
+	 * variable to keep track of the total score.
+	 */
+	private Timer timer1;
+	private int score = 0;
+	
+	/**
+	 * Positions to spawn the ghosts at.
+	 */
 	private final int[][] lgpos = {
 		{PANEL_WIDTH, 15}, {PANEL_WIDTH, 75}, {PANEL_WIDTH, 135},
 		{PANEL_WIDTH, 195}, {PANEL_WIDTH, 255}, {PANEL_WIDTH, 315}
@@ -51,6 +73,9 @@ public class StartMenu extends JPanel implements ActionListener {
 			{PANEL_WIDTH - 30, 195}, {PANEL_WIDTH - 30, 255}, {PANEL_WIDTH - 30, 315}
 	};
 	
+	/**
+	 * Constructor to create the starting panel of the game.
+	 */
 	public StartMenu() {
 		this.background = new ImageIcon("Background.jpg").getImage();
 		this.pacman = new Pacman(PACMAN_STARTX, PACMAN_STARTY);
@@ -64,16 +89,14 @@ public class StartMenu extends JPanel implements ActionListener {
 		
 		lghosts = new ArrayList<>();
 		dghosts = new ArrayList<>();
-		/*
-		for (int[] p : lgpos) {
-			lghosts.add(new Left_Ghost(p[0], p[1]));
-		}
-		
-		for (int[] dp : twohpos) {
-			dghosts.add(new Diagonal_Ghost(dp[0], dp[1]));
-		} */
 	}
 	
+	/**
+	 * Paint method to post all of the images onto the window screen. If the game
+	 * is currently being played, then it will draw the Pacman and all the ghost
+	 * enemies. If the game over state is reached, then it will draw the game over
+	 * screen plus the final score and leaderboard of high scores.
+	 */
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2d=(Graphics2D)g;
@@ -143,6 +166,11 @@ public class StartMenu extends JPanel implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Action Listener that runs whenever the timer progresses, updating all of
+	 * the entities on screen and checking for collisions between entities. It
+	 * also adds enemies onto the screen.
+	 */
 	public void actionPerformed(ActionEvent e) {
 		
 		checkCollisions();
@@ -158,11 +186,19 @@ public class StartMenu extends JPanel implements ActionListener {
         this.repaint();
     }
 	
+	/**
+	 * Checks to see if the game is still in a playing state, and stops the timer
+	 * if the game has reached a game over state.
+	 */
 	private void Playing() {
 		if (!playing)
 			timer1.stop();
 	}
 	
+	/**
+	 * Adds the ghosts based on the counter being incremented, plus if the maximum
+	 * amount of each type of ghost has been reached or not.
+	 */
 	private void addGhosts() {
 		Random rand = new Random();
 		int random_pos1 = rand.nextInt(6);
@@ -177,11 +213,17 @@ public class StartMenu extends JPanel implements ActionListener {
 		}
 	}
     
+	/**
+	 * Updates the position of the Pacman entity.
+	 */
     private void updatePacman() {
     	if (pacman.isVisible())
     		pacman.move();         
     }
     
+    /**
+     * Updates the position of every Bullet entity.
+     */
     private void updateBullets() {
     	List<Bullet> bullets = pacman.getBullets();
     	
@@ -194,7 +236,9 @@ public class StartMenu extends JPanel implements ActionListener {
     			bullets.remove(i);
     	}
     }
-    
+    /**
+     * Updates the position of all the ghosts on screen.
+     */
     private void updateGhosts() {
     	for (int i = 0; i < lghosts.size(); i++)
     	{
@@ -214,6 +258,11 @@ public class StartMenu extends JPanel implements ActionListener {
     	}
     }
     
+    /**
+     * Checks for collisions between the Pacman and the Ghosts, plus collisions
+     * between the Bullets and the Ghosts. A game over state is reached if the 
+     * Pacman collides with a Ghost.
+     */
     public void checkCollisions() {
     	Rectangle pacman_bounds = pacman.getBounds();
     	
@@ -270,6 +319,9 @@ public class StartMenu extends JPanel implements ActionListener {
     	}
     }
     
+    /**
+     * private KeyAdapter class to listen for key inputs for the Pacman entity.
+     */
     private class TAdapter extends KeyAdapter {
 
         @Override
